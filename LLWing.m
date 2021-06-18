@@ -51,13 +51,16 @@ if convergence
         [inv_A,wake_len] = infcoeff(N,c4nods,c75nods,normals,h) ;
         [GAMMA,Ui,ncases] = getcirc(N,ALPHA,inv_A,normals) ;
         [cl_local,force_coeff] = KuttaJoukowsky(N,c4nods,h,GAMMA,Ui,s_pan,Cm0_y,chord,CDP,ncases,wake_len,S,mac,ALPHA) ;
-        results(1,i) = force_coeff(3, 1);
+        results(1,i) = force_coeff(7, 1);
     end
     
-    plot(N_conv, results); grid on;
+    plot(log2(N_conv), results); grid on;
     title('Convergence test for the number of panels');
-    xlabel('number of panels');
-    ylabel('force per unit chord (N/m)');
+    xlabel('log2(number of panels)');
+    ylabel('Cl');
+    yline(max(results), '--', round(max(results), 5));
+    ylim([min(results) max(results)*1.05]);
+    xlim([1 max(log2(N_conv))*1.1]);
     
     return;
 end
@@ -103,7 +106,7 @@ x_cg = 1.3; % position of the gravity center
 subplot(3, 2, 1);
 Cl_slope = polyfit(ALPHA, force_coeff(7,:), 1);
 alpha_l0 = -Cl_slope(2)/Cl_slope(1);
-fprintf('Cl slope\n');
+fprintf('\n\nCl slope\n');
 fprintf('  * alpha Cl0: %f dg\n  * dCl/dalpha: %f 1/dg\n\n', alpha_l0, Cl_slope(1));
 hold on;
 v = yline(0);
@@ -124,6 +127,7 @@ subplot(3, 2, 2);
 Cm_slope = polyfit(force_coeff(7,:), force_coeff(5,:), 1);
 X_ac = -Cm_slope(1)*c_avg;
 fprintf('Cm slope\n');
+fprintf('  * Cm = %f*Cl + %f\n', Cm_slope(1), Cm_slope(2));
 fprintf('  * Cm0: %f\n  * Xac: %f \n\n', Cm_slope(2), X_ac);
 hold on;
 v = yline(0);
